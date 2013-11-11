@@ -1,7 +1,6 @@
 package com.jdatareconciliation.processors;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.jdatareconciliation.ProcessorConfiguration;
@@ -23,10 +22,10 @@ public abstract class AbstractProcessor implements IProcessor {
   
   /** The is connected. */
   private boolean isConnected;
-  
-  /** The required attributes. */
-  protected String[] requiredAttributes = new String[]{};
 
+  /** The input data. */
+  private Map<String, Object> inputData;
+  
   /**
    * Instantiates a new abstract processor.
    *
@@ -48,7 +47,6 @@ public abstract class AbstractProcessor implements IProcessor {
    */
   public void beforeConnect()
       throws ConfigurationException {
-    System.out.println("Abstract processor | beforeConnect | connectionConfiguration = " + connectionConfiguration);
 
     if (!isConfigurationValid()) {
       throw new ConfigurationException(String.format(
@@ -73,6 +71,7 @@ public abstract class AbstractProcessor implements IProcessor {
     System.out.println("Abstract processor | doLogic");
     beforeConnect();
     connect();
+    extractSourceData();
     process();
     disconnect();
   }
@@ -84,14 +83,13 @@ public abstract class AbstractProcessor implements IProcessor {
    * @return true, if is configuration valid
    */
   protected boolean isConfigurationValid() {
-    System.out.println("connection configuration params: " + connectionConfiguration);
     boolean result = true;
     if (this.connectionConfiguration != null && this.connectionConfiguration.getParameters() != null) {
       for (String mField : getRequiredAttributes()) {
-        System.out.println("Mandatory field: " + mField);
+        //System.out.println("Mandatory field: " + mField);
         
         Properties parameters = connectionConfiguration.getParameters();
-        System.out.println("key is contained: " + parameters.containsKey(mField));
+        //System.out.println("key is contained: " + parameters.containsKey(mField));
         result &= parameters.containsKey(mField);
       }
     }
@@ -133,21 +131,47 @@ public abstract class AbstractProcessor implements IProcessor {
   }
   
   /**
-   * Gets the required attributes.
-   *
-   * @return the required attributes
-   */
-  public List<String> getRequiredAttributes() {
-    return Arrays.asList(requiredAttributes);
-  }
-  
-  
-  /**
    * String of mandatory fields.
    *
    * @return the string
    */
   protected String stringOfMandatoryFields() {
     return getRequiredAttributes().toString();
+  }
+  
+  /**
+   * Gets the connection configuration.
+   *
+   * @return the connection configuration
+   */
+  protected ConnectionConfiguration getConnectionConfiguration() {
+    return this.connectionConfiguration;
+  }
+  
+  /**
+   * Gets the processor configuration.
+   *
+   * @return the processor configuration
+   */
+  protected ProcessorConfiguration getProcessorConfiguration() {
+    return this.processorConfiguration;
+  }
+  
+  /**
+   * Gets the input data.
+   *
+   * @return the input data
+   */
+  protected Map<String, Object> getInputData() {
+    return this.inputData;
+  }
+  
+  /**
+   * Sets the input data.
+   *
+   * @param inputData the input data
+   */
+  protected void setInputData(Map<String, Object> inputData) {
+    this.inputData = inputData;
   }
 }

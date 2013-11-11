@@ -1,0 +1,24 @@
+<configuration source = 'xml' dest = 'db'>
+	<connection-configuration>
+		<input-connection type = "file|db|...">
+			<filename>in.txt</filename>
+			<filetype>txt</filetype>
+		</input-connection>
+		<output-connection type = "file|db|...">
+			<filename>out.txt</filename>
+			<filetype>txt</filetype>
+		</output-connection>
+	</connection-configuration>
+	
+	<processor-configuration class = "com.jdatareconciliation.processors.FileProcessor">
+		<rule type = "mapping" catch-method = "xpath|query" class = "com.jdatareconciliation.extractors.XMLDataExtractor">
+			<fieldset>
+				<attribute source = "name of the source column" dest = "name of the dest column" />
+				<!-- .... -->
+				<attribute source = "name of the source column" dest = "name of the dest column" />
+			</fieldset>
+		</rule>
+		<rule type = "validation" ..... />
+		<rule type = "custom" implementation = "com.jdatareconciliation.rules.CustomImplementationRule" />
+	</processor-configuration>
+</configuration>

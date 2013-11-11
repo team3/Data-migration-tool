@@ -2,21 +2,30 @@ package com.jdatareconciliation.processors;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jdatareconciliation.ProcessorConfiguration;
+import com.jdatareconciliation.configuration.Mapping;
 import com.jdatareconciliation.connection.ConnectionConfiguration;
+import com.jdatareconciliation.extractors.IExtractor;
+import com.jdatareconciliation.processors.exceptions.DataExtractorException;
 import com.jdatareconciliation.processors.exceptions.DataProcessingException;
 import com.jdatareconciliation.processors.exceptions.ProcessorConnectionException;
 
@@ -58,10 +67,10 @@ public class FileProcessor extends AbstractProcessor {
       PROPERTY_OUTPUT_FILENAME, PROPERT_OUTPUT_FILETYPE };
 
   /** The is. */
-  private InputStream         is;
+  protected InputStream         is;
 
   /** The os. */
-  private OutputStream        os;
+  protected OutputStream        os;
 
 
   /* (non-Javadoc)
@@ -76,6 +85,60 @@ public class FileProcessor extends AbstractProcessor {
     openDestConnection();
   }
 
+  /* (non-Javadoc)
+   * @see com.jdatareconciliation.processors.IProcessor#extractSourceData()
+   */
+  @Override
+  public void extractSourceData() throws DataProcessingException{
+    // using processor configuration extract the source data
+    /*
+     * Configuration should be valid. Validation process should be performed before connecttion to the datasource.
+     */
+    Mapping.Rule rule  = getProcessorConfiguration().getMapping().getRuleByTypename(Mapping.Rule.TYPE_MAPPING);
+    String classname = rule.getImplClass();
+    // invoking the extractor's implementation
+    Class<?> clazz;
+    try {
+      clazz = Class.forName(classname);
+
+      String datasourceType = "file";
+      // TODO get datasource type from the configuration
+      if (StringUtils.equals("file", datasourceType)) {
+        Constructor<?> con = clazz.getConstructor(Mapping.Rule.Fieldset.class, InputStream.class);
+        IExtractor extractor = (IExtractor) con.newInstance(rule.getFieldset(), getInputStream());
+        Map<String, Object> data = extractor.extract();
+        
+        System.out.println("extracted data: " + data.size());
+        
+        setInputData(data);
+      }
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (SecurityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (InstantiationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (DataExtractorException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+  
 
   /* (non-Javadoc)
    * @see com.jdatareconciliation.processors.IProcessor#process()
@@ -115,7 +178,7 @@ public class FileProcessor extends AbstractProcessor {
    */
   protected void openSourceConnection() throws ProcessorConnectionException {
     System.out.println("open source connection | filename: "
-        + PROPERTY_INPUT_FILENAME);
+        + getConnectionParameter(PROPERTY_INPUT_FILENAME));
     // getting the name of the file
     String filename = getConnectionParameter(PROPERTY_INPUT_FILENAME);
     try {
@@ -132,7 +195,7 @@ public class FileProcessor extends AbstractProcessor {
    *           the processor connection exception
    */
   protected void openDestConnection() throws ProcessorConnectionException {
-    System.out.println("open source connection | filename: " + PROPERTY_OUTPUT_FILENAME);
+    System.out.println("open source connection | filename: " + getConnectionParameter(PROPERTY_OUTPUT_FILENAME));
     String outputFileName = getConnectionParameter(PROPERTY_OUTPUT_FILENAME);
 
     if (StringUtils.isEmpty(outputFileName)) {
@@ -172,5 +235,16 @@ public class FileProcessor extends AbstractProcessor {
   @Override
   public List<String> getRequiredAttributes() {
     return Arrays.asList(requiredAttributes);
+  }
+  
+  /**
+   * Write to stream.
+   *
+   * @param is the is
+   * @throws IOException 
+   */
+  protected void writeToStream(Object data) throws IOException {
+    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getOutputStream()));
+    bw.write(data.toString());
   }
 }

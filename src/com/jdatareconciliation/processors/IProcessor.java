@@ -1,5 +1,7 @@
 package com.jdatareconciliation.processors;
 
+import java.util.List;
+
 import com.jdatareconciliation.processors.exceptions.ConfigurationException;
 import com.jdatareconciliation.processors.exceptions.DataProcessingException;
 import com.jdatareconciliation.processors.exceptions.ProcessorConnectionException;
@@ -24,6 +26,14 @@ public interface IProcessor {
    */
   void connect() throws ProcessorConnectionException;
   
+
+  /**
+   * Extract source data.
+   *
+   * @throws DataProcessingException the data processing exception
+   */
+  void extractSourceData() throws DataProcessingException;
+  
   /**
    * Process.
    *
@@ -45,4 +55,11 @@ public interface IProcessor {
    * @return connection status
    */
   boolean isConnected();
+  
+  /**
+   * Gets the required attributes.
+   *
+   * @return the required attributes
+   */
+  List<String> getRequiredAttributes();
 }
