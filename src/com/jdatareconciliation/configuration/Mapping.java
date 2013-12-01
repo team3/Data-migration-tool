@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.jdatareconciliation.configuration;
 
 import java.util.ArrayList;
@@ -46,11 +49,20 @@ public class Mapping {
      * The Class Fieldset.
      */
     public static class Fieldset {
+      /** The colums separator. */
+      String columsSeparator;
+      
       /**
        * The Class Attribute.
        */
       public static class Attribute {
-
+        
+        /** The Constant TYPE_SIGNLE_KEY. */
+        public static final int TYPE_SIGNLE_KEY = 0x1;
+        
+        /** The Constant TYPE_MULTIPLE_KEY. */
+        public static final int TYPE_MULTIPLE_KEY = 0x2;
+        
         /** The source. */
         String source;
 
@@ -60,6 +72,9 @@ public class Mapping {
         /** The extractor. */
         String extractor;
 
+        /** The type. */
+        int type;
+        
         /**
          * Gets the source.
          * 
@@ -112,6 +127,38 @@ public class Mapping {
         public void setExtractor(String extractor) {
           this.extractor = extractor;
         }
+
+        /**
+         * @return the type
+         */
+        public int getType() {
+          return type;
+        }
+
+        /**
+         * @param type the type to set
+         */
+        public void setType(int type) {
+          this.type = type;
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+          StringBuilder builder = new StringBuilder();
+          builder.append("Attribute [source=");
+          builder.append(source);
+          builder.append(", dest=");
+          builder.append(dest);
+          builder.append(", extractor=");
+          builder.append(extractor);
+          builder.append(", type=");
+          builder.append(type);
+          builder.append("]");
+          return builder.toString();
+        }
       }
 
       /** The attributes. */
@@ -138,6 +185,20 @@ public class Mapping {
        */
       public void setAttributes(List<Attribute> attributes) {
         this.attributes = attributes;
+      }
+
+      /**
+       * @return the columsSeparator
+       */
+      public String getColumsSeparator() {
+        return columsSeparator;
+      }
+
+      /**
+       * @param columsSeparator the columsSeparator to set
+       */
+      public void setColumsSeparator(String columsSeparator) {
+        this.columsSeparator = columsSeparator;
       }
     }
 

@@ -43,25 +43,14 @@ public class XMLDataExtractor extends GeneralFileExtractor {
    */
   @Override
   public Map<String, Object> extract() throws DataExtractorException {
-    if (getInputStream() == null) {
-      throw new DataExtractorException("Input data stream is null");
-    }
-
-    if (getFieldset() == null) {
-      throw new DataExtractorException(
-          "Configuration of the fieldset is not defined");
-    }
-
-    if (getFieldset().getAttributes() == null) {
-      throw new DataExtractorException(
-          "No input items of the fielset have been found");
-    }
+    validate();
 
     Map<String, Object> map = new HashMap<String, Object>(getFieldset()
         .getAttributes().size());
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
+    
     try {
       DocumentBuilder builder = factory.newDocumentBuilder();
       Document document = builder.parse(getInputStream());
@@ -73,7 +62,7 @@ public class XMLDataExtractor extends GeneralFileExtractor {
       
       for (Mapping.Rule.Fieldset.Attribute attribute : getFieldset().getAttributes()) {
         value = extraxtValue(document, attribute, xpath);
-        
+
         map.put(attribute.getSource(), value);
       }
     } catch (ParserConfigurationException e) {
@@ -110,8 +99,9 @@ public class XMLDataExtractor extends GeneralFileExtractor {
       
       NodeList nodes = (NodeList) exResult;
       if (nodes.getLength() > 1) {
-        throw new DataExtractorException(
-            "Configuration error. Selection expression reflects by " + nodes.getLength() + " in configuration");
+        throw new DataExtractorException(String.format(
+            "Configuration error. Configuration containes %s values for the specified key instead of 1",
+            nodes.getLength()));
       }
       
       value = nodes.item(0).getNodeValue();

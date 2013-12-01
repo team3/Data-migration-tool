@@ -3,6 +3,7 @@ package com.jdatareconciliation.extractors;
 import java.io.InputStream;
 
 import com.jdatareconciliation.configuration.Mapping;
+import com.jdatareconciliation.processors.exceptions.DataExtractorException;
 
 /**
  * The Class GeneralFileExtractor.
@@ -10,7 +11,7 @@ import com.jdatareconciliation.configuration.Mapping;
 public abstract class GeneralFileExtractor extends AbstractExtractor {
 
   /** source of the data represeting by the link to input stream. */
-  private InputStream is;
+  protected InputStream is;
 
   /**
    * Instantiates a new general file extractor.
@@ -29,6 +30,8 @@ public abstract class GeneralFileExtractor extends AbstractExtractor {
    */
   public GeneralFileExtractor(Mapping.Rule.Fieldset fieldset, InputStream is) {
     super(fieldset);
+    /* setting the input stream */
+    this.is = is;
   }
 
   /**
@@ -37,6 +40,27 @@ public abstract class GeneralFileExtractor extends AbstractExtractor {
    * @return the input stream
    */
   protected InputStream getInputStream() {
-    return this.is;
+    return is;
+  }
+  
+  /**
+   * Validate.
+   *
+   * @throws DataExtractorException the data extractor exception
+   */
+  protected void validate() throws DataExtractorException {
+    if (getInputStream() == null) {
+      throw new DataExtractorException("Input data stream is null");
+    }
+
+    if (getFieldset() == null) {
+      throw new DataExtractorException(
+          "Configuration of the fieldset is not defined");
+    }
+
+    if (getFieldset().getAttributes() == null) {
+      throw new DataExtractorException(
+          "No input items of the fielset have been found");
+    }
   }
 }

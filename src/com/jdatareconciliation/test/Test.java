@@ -46,11 +46,12 @@ public class Test {
     Mapping.Rule.Fieldset.Attribute attribute = new Mapping.Rule.Fieldset.Attribute();
     attribute.setSource("attr1");
     attribute.setDest("dest1");
-    // TODO
-    attribute.setExtractor("//book[author='Neal Stephenson']/title/text()");
+    attribute.setExtractor("//book[author='Larry Niven']/title/text()");
+    
     fieldset.getAttributes().add(attribute);
     rule.setFieldset(fieldset);
     rule.setImplClass("com.jdatareconciliation.extractors.XMLDataExtractor");
+    
     mapping.getRules().add(rule);
     processorConfiguration.setMapping(mapping);
     
@@ -59,13 +60,10 @@ public class Test {
     try {
       processor.doLogic();
     } catch (ProcessorConnectionException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (ConfigurationException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (DataProcessingException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }

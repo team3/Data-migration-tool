@@ -11,11 +11,19 @@
 	</connection-configuration>
 	
 	<processor-configuration class = "com.jdatareconciliation.processors.FileProcessor">
-		<rule type = "mapping" catch-method = "xpath|query" class = "com.jdatareconciliation.extractors.XMLDataExtractor">
-			<fieldset>
+		<rule type = "mapping" catch-method = "xpath" class = "com.jdatareconciliation.extractors.XMLDataExtractor">
+			<fieldset column-separator>
+				<!-- xml configuration -->
 				<attribute source = "name of the source column" dest = "name of the dest column" />
 				<!-- .... -->
 				<attribute source = "name of the source column" dest = "name of the dest column" />
+				
+				<!-- csv configuration -->
+				<attribute source = "number of the field | name of the field" dest = "name of the column"
+				  type = "multiple|single"
+				/>
+				
+				<!-- xls configuration -->
 			</fieldset>
 		</rule>
 		<rule type = "validation" ..... />

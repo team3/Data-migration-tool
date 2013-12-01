@@ -37,6 +37,7 @@ public class XMLFileProcessor extends FileProcessor {
     Map<String, Object> sourceData = getInputData();
     
     for (Map.Entry<String, Object> e: sourceData.entrySet()) {
+      System.out.println("Writing: " + e.getKey() + "-" + e.getValue());
       try {
         writeToStream(e.getKey() + "-" + e.getValue());
       } catch (IOException e1) {
